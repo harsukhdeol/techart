@@ -1,0 +1,214 @@
+# harsukh.dev — portfolio site
+
+A React + Vite portfolio for documenting techniques, experiments, and project deep-dives.
+Pastel OS-window aesthetic — graph-paper background, browser chrome header, tab navigation.
+
+---
+
+## Quick start
+
+```bash
+npm install
+npm run dev      # → http://localhost:5173
+```
+
+```bash
+npm run build    # production build → /dist
+npm run preview  # preview the production build locally
+```
+
+---
+
+## Adding a new project
+
+Open `src/config/projects.js` and copy the template block at the top of the file.
+Paste it as the first item in the `projects` array (newest first), then fill in:
+
+```js
+{
+  id: 'my-project-slug',          // URL: harsukh.dev/#/my-project-slug
+
+  title:       'What I built',
+  description: 'One-line summary shown on the card.',
+  date:        'May 2025',
+  readTime:    '5 min read',
+  difficulty:  'Intermediate',    // 'Beginner' | 'Intermediate' | 'Advanced'
+  isNew:       true,              // shows a NEW badge on the card
+
+  imageSrc:    '/images/my-cover.webp',   // or null for a placeholder
+  imageAlt:    'Screenshot of the result',
+  imageColor:  '#F5BFCE',         // placeholder background when imageSrc is null
+
+  tags: [
+    { label: 'Shaders',  variant: 'pink' },
+    { label: 'Niagara',  variant: 'lavender' },
+  ],
+
+  sections: [
+    {
+      type:    'problem',
+      heading: 'The problem',
+      content: ['Paragraph one.', 'Paragraph two.'],
+    },
+    {
+      type:    'process',
+      heading: 'My process',
+      content: ['Before the images.'],
+      images: [
+        { src: '/images/my-graph.webp', alt: 'Material graph', caption: 'material graph', color: '#FCE8F2' },
+      ],
+      contentAfter: ['After the images.'],
+    },
+    {
+      type:    'result',
+      heading: 'The result',
+      content: ['What came out of it.'],
+    },
+    {
+      type:    'takeaways',
+      heading: 'Key takeaways',
+      items: [
+        'First thing I learned.',
+        'Second thing I learned.',
+      ],
+    },
+  ],
+}
+```
+
+### Section types
+
+| type        | renders                                          |
+|-------------|--------------------------------------------------|
+| `problem`   | Pink label — the challenge or starting point     |
+| `process`   | Lavender label — how you approached it           |
+| `result`    | Peach label — what came out                      |
+| `takeaways` | Sage label — bullet list of key learnings        |
+
+---
+
+## Adding images
+
+Put image files in `public/images/`, then reference them in `projects.js`:
+
+```js
+imageSrc: '/images/water-ripple.webp'
+```
+
+**Recommended format:** WebP, 1200 × 675 px (16:9) for cover images.
+Inline section images can be any size — they're constrained by the content column.
+
+If `imageSrc` is `null`, a tinted graph-paper placeholder is shown until you add the real image.
+
+---
+
+## Changing colors and fonts
+
+Edit `src/config/theme.js` — every CSS variable on the site is injected from this file at startup.
+
+```js
+colors: {
+  bg:       '#FFF2F7',   // page background
+  chrome:   '#F9C4D8',   // title bar, tab bar, footer
+  accent:   '#BB3575',   // links, badges, active states
+  // …
+},
+fonts: {
+  body: "'Nunito', sans-serif",     // swap to any Google Font
+  mono: "'Courier New', monospace", // logo, labels, address bar
+},
+```
+
+### Changing the body font to a Google Font
+
+1. Pick a font at [fonts.google.com](https://fonts.google.com)
+2. Add the `<link>` tag to `index.html` (there's a comment showing where)
+3. Update `fonts.body` in `theme.js`, e.g. `"'Nunito', sans-serif"`
+
+### Adding a new tag color variant
+
+Add an entry to `tagVariants` in `theme.js`:
+
+```js
+tagVariants: {
+  coral: { bg: '#FFE8E0', text: '#8B2500' },
+  // …
+}
+```
+
+Then use it in `projects.js`:
+
+```js
+tags: [{ label: 'Custom', variant: 'coral' }]
+```
+
+---
+
+## Editing site text (title, tagline, about)
+
+Edit `src/config/site.js`:
+
+```js
+export const siteConfig = {
+  title:        'HARSUKH.DEV',
+  heroTitle:    'Making things,',
+  heroEmphasis: 'documenting every step.',
+  heroSubtitle: 'An ongoing collection of techniques, experiments, and creative deep-dives.',
+  oldSiteUrl:   'https://your-old-portfolio.com',  // null to hide
+  about: {
+    title: 'About',
+    paragraphs: [
+      "Hi, I'm Harsukh — ...",
+    ],
+  },
+}
+```
+
+---
+
+## Deploying
+
+The site uses `HashRouter` so it works on **any static host** with zero server config.
+
+### GitHub Pages
+
+```bash
+npm run build
+# push /dist to your gh-pages branch, or use gh-pages package
+```
+
+### Netlify / Vercel
+
+Connect your repo — both detect Vite automatically.
+Build command: `npm run build`
+Publish directory: `dist`
+
+No redirect rules needed because all routing is client-side via the `#` hash.
+
+---
+
+## Project structure
+
+```
+src/
+├── config/
+│   ├── projects.js   ← add all your projects here
+│   ├── site.js       ← title, tagline, about text
+│   └── theme.js      ← colors, fonts, spacing
+├── components/
+│   ├── WindowChrome.jsx   browser-window header + tabs
+│   ├── Footer.jsx
+│   ├── Tag.jsx            colored pill labels
+│   ├── ProjectCard.jsx    homepage grid card
+│   └── ImageBlock.jsx     inline image with placeholder
+├── pages/
+│   ├── HomePage.jsx       grid + filter pills
+│   ├── ProjectPage.jsx    full case-study layout
+│   └── AboutPage.jsx
+├── App.jsx     routes
+├── main.jsx    CSS variable injection + React root
+└── index.css   all styles (driven by CSS variables from theme.js)
+
+public/
+└── images/     put your project images here
+```
